@@ -1,0 +1,33 @@
+# Virtual Environment
+venv/
+
+# Environment Variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Downloads
+downloads/
+downloads
+
+# Chroma DB
+vector_db/
+
+# Whisper Cache
+.cache/
+
+# Audio / Video Files
+*.wav
+*.mp3
+*.m4a
+*.mp4
+*.webm
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
