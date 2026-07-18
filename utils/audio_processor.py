@@ -22,8 +22,23 @@ def download_youtube_audio(url: str) -> str:
     )
 
     ydl_opts = {
-        "format": "bestaudio/best",
+        "format": "bestaudio[ext=m4a]/bestaudio",
+
         "outtmpl": output_path,
+
+        "http_headers": {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/126.0 Safari/537.36"
+            )
+        },
+
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "web"]
+            }
+        },
 
         "postprocessors": [
             {
@@ -35,6 +50,7 @@ def download_youtube_audio(url: str) -> str:
 
         "quiet": False,
         "noplaylist": True,
+        "geo_bypass": True,
     }
 
     try:
@@ -46,11 +62,16 @@ def download_youtube_audio(url: str) -> str:
                 download=True
             )
 
-            filename = ydl.prepare_filename(info)
+            filename = ydl.prepare_filename(
+                info
+            )
 
     except Exception as e:
 
-        print(f"YT-DLP Error: {e}")
+        print(
+            f"YT-DLP Error: {e}"
+        )
+
         raise
 
     filename = (
@@ -60,7 +81,6 @@ def download_youtube_audio(url: str) -> str:
     )
 
     return filename
-
 
 # -------------------------------
 # Convert Local File to WAV
