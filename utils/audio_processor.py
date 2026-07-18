@@ -22,7 +22,7 @@ def download_youtube_audio(url: str) -> str:
     )
 
     ydl_opts = {
-        "format": "bestaudio[ext=m4a]/bestaudio",
+        "format": "bestaudio/best",
 
         "outtmpl": output_path,
 
