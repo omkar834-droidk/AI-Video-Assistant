@@ -1,22 +1,7 @@
 import whisper
-
-import os
-
-import shutil
-
-FFMPEG_DIR = os.getenv("FFMPEG_DIR", "")
-FFMPEG_PATH = shutil.which("ffmpeg") or os.path.join(FFMPEG_DIR, "ffmpeg.exe" if os.name == "nt" else "ffmpeg")
-
-if FFMPEG_DIR:
-    os.environ["PATH"] = FFMPEG_DIR + os.pathsep + os.environ["PATH"]
-os.environ["PATH"] = FFMPEG_DIR + os.pathsep + os.environ["PATH"]
 import os
 import requests
 from pydub import AudioSegment
-
-import whisper.audio
-
-whisper.audio.FFMPEG = r"C:\Users\govind dongare\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin\ffmpeg.exe"
 
 # Sarvam's sync STT-translate API rejects audio longer than 30s.
 # We slice each chunk into 25s pieces (with a 5s safety margin) before sending.

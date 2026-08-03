@@ -6,7 +6,6 @@ from core.transcriber import transcribe_all
 from core.summarizer import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
 from core.rag_engine import build_rag_chain, ask_question
-import traceback
 
 load_dotenv()
 
@@ -422,10 +421,10 @@ if run_btn:
             st.rerun()
 
         except Exception as e:
-            
-           traceback.print_exc()
-           st.exception(e)
-            
+            for k in ["audio","transcript","title","summary","extract","rag"]:
+                if st.session_state.pipeline_steps.get(k) == "active":
+                    st.session_state.pipeline_steps[k] = "pending"
+            progress_placeholder.error(f"❌ Error: {e}")
 
 # ── Results ──────────────────────────────────────────────────────────────────────
 if st.session_state.result:
