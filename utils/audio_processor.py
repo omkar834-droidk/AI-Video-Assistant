@@ -4,10 +4,10 @@ import yt_dlp
 from pydub import AudioSegment
 
 # -------------------------------
-# FFmpeg Configuration (portable — local Windows + Streamlit Cloud/Linux )
+# FFmpeg Configuration (portable — local Windows + Streamlit Cloud/Linux दोन्हीवर चालतं)
 # -------------------------------
-FFMPEG_DIR = os.getenv("FFMPEG_DIR", "")         
-SYSTEM_FFMPEG = shutil.which("ffmpeg")             
+FFMPEG_DIR = os.getenv("FFMPEG_DIR", "")          # फक्त local dev साठी .env मध्ये set कर
+SYSTEM_FFMPEG = shutil.which("ffmpeg")             # cloud/Linux वर system ffmpeg auto-detect
 SYSTEM_FFPROBE = shutil.which("ffprobe")
 
 if FFMPEG_DIR:
