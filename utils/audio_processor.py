@@ -1,14 +1,26 @@
 import os
+import shutil
 import yt_dlp
 from pydub import AudioSegment
 
 # -------------------------------
-# FFmpeg Configuration
+# FFmpeg Configuration (portable — local Windows + Streamlit Cloud/Linux )
 # -------------------------------
-FFMPEG_DIR = r"C:\Users\govind dongare\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.2-full_build\bin"
+FFMPEG_DIR = os.getenv("FFMPEG_DIR", "")         
+SYSTEM_FFMPEG = shutil.which("ffmpeg")             
+SYSTEM_FFPROBE = shutil.which("ffprobe")
 
-AudioSegment.converter = os.path.join(FFMPEG_DIR, "ffmpeg.exe")
-AudioSegment.ffprobe = os.path.join(FFMPEG_DIR, "ffprobe.exe")
+if FFMPEG_DIR:
+    os.environ["PATH"] = FFMPEG_DIR + os.pathsep + os.environ["PATH"]
+    exe_ext = ".exe" if os.name == "nt" else ""
+    FFMPEG_PATH = os.path.join(FFMPEG_DIR, f"ffmpeg{exe_ext}")
+    FFPROBE_PATH = os.path.join(FFMPEG_DIR, f"ffprobe{exe_ext}")
+else:
+    FFMPEG_PATH = SYSTEM_FFMPEG or "ffmpeg"
+    FFPROBE_PATH = SYSTEM_FFPROBE or "ffprobe"
+
+AudioSegment.converter = FFMPEG_PATH
+AudioSegment.ffprobe = FFPROBE_PATH
 
 # -------------------------------
 # Download Folder
@@ -25,11 +37,10 @@ def download_youtube_audio(url: str) -> str:
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
 
     ydl_opts = {
-        "format": "140",  # Audio format (m4a)
+        "format": "bestaudio/best",           # rigid "140" ऐवजी — जास्त reliable
         "outtmpl": output_path,
 
-        # IMPORTANT
-        "ffmpeg_location": FFMPEG_DIR,
+        "ffmpeg_location": os.path.dirname(FFMPEG_PATH) if FFMPEG_DIR else None,
 
         "postprocessors": [
             {
@@ -41,7 +52,21 @@ def download_youtube_audio(url: str) -> str:
 
         "quiet": True,
         "noplaylist": True,
+
+        "extractor_args": {
+            "youtube": {"player_client": ["android", "web"]}
+        },
+        "http_headers": {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            )
+        },
     }
+
+    cookies_file = os.getenv("YT_COOKIES_FILE")
+    if cookies_file and os.path.exists(cookies_file):
+        ydl_opts["cookiefile"] = cookies_file
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
