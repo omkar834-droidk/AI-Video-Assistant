@@ -1,5 +1,5 @@
 # ── AI Meeting Assistant ── requirements.txt ──────────────────────────────────
-  Python >= 3.10 recommended
+
 
 yt-dlp @ https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/latest/download/yt_dlp.tar.gz
 pydub>=0.25.1                     # Audio file manipulation / format conversion
