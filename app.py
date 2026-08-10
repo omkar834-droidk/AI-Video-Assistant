@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 from dotenv import load_dotenv
-from utils.audio_processor import process_input
+from utils.audio_processor import process_input, get_youtube_transcript
 from core.transcriber import transcribe_all
 from core.summarizer import summarize, generate_title
 from core.extractor import extract_action_items, extract_key_decisions, extract_questions
@@ -379,13 +379,29 @@ if run_btn:
             with progress_placeholder.container():
                 st.info("⚙️ Pipeline running — see sidebar for live status…")
 
-            update_step("audio", "active")
-            chunks = process_input(source)
-            update_step("audio", "done")
+            is_youtube = source.strip().startswith(("http://", "https://"))
 
-            update_step("transcript", "active")
-            transcript = transcribe_all(chunks, language)
-            update_step("transcript", "done")
+            update_step("audio", "active")
+            if is_youtube:
+                try:
+                    transcript = get_youtube_transcript(source)
+                    update_step("audio", "done")
+                    update_step("transcript", "done")  # captions मिळाले, वेगळी transcription पायरी लागत नाही
+                except RuntimeError:
+                    # captions उपलब्ध नाहीत -> audio download + Whisper/Sarvam वर fallback
+                    chunks = process_input(source)
+                    update_step("audio", "done")
+
+                    update_step("transcript", "active")
+                    transcript = transcribe_all(chunks, language)
+                    update_step("transcript", "done")
+            else:
+                chunks = process_input(source)
+                update_step("audio", "done")
+
+                update_step("transcript", "active")
+                transcript = transcribe_all(chunks, language)
+                update_step("transcript", "done")
 
             update_step("title", "active")
             title = generate_title(transcript)
